@@ -8,7 +8,13 @@ const rl = createInterface({
 function repl() {
   rl.question("$ ", (answer: string) => {
     if (answer === "exit") return rl.close();
-    console.log(answer + ": command not found");
+
+    const ansArray = answer.split(" ");
+    if (ansArray[0] === "echo") {
+      console.log(ansArray.slice(1).join(" "));
+    } else {
+      console.log(answer + ": command not found");
+    }
     repl();
   });
 }
