@@ -9,25 +9,39 @@ const builtins = ["exit", "echo", "type"];
 
 function repl() {
   rl.question("$ ", (answer: string) => {
-    if (answer === "exit") return rl.close();
-
     const ansArray = answer.split(" ");
+    const cmd = ansArray[0];
+    const arg = ansArray.slice(1).join(" ");
 
-    if (ansArray[0] === "type") {
-      const cmd = ansArray.slice(1).join(" ");
-      if (builtins.includes(cmd)) {
-        console.log(cmd + " is a shell builtin");
-      } else {
-        console.log("invalid_command: not found");
-      }
-    }
+    switch (cmd) {
+      case "exit":
+        return rl.close();
 
-    if (ansArray[0] === "echo") {
-      console.log(ansArray.slice(1).join(" "));
-    } else {
-      console.log(answer + ": command not found");
+      case "type":
+        if (builtins.includes(arg)) {
+          console.log(arg + " is a shell builtin");
+        } else {
+          console.log(arg + ": not found");
+        }
+        break;
+
+      case "echo":
+        console.log(arg);
+        break;
+
+      default:
+        console.log(answer + ": command not found");
+        break;
     }
     repl();
+
+    // if (answer === "exit")
+    //   if (ansArray[0] === "type") {
+    //     repl();
+    //   }
+    //
+    // if (ansArray[0] === "echo") {
+    // repl();
   });
 }
 
