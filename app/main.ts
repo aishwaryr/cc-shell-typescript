@@ -34,14 +34,6 @@ function repl() {
         break;
     }
     repl();
-
-    // if (answer === "exit")
-    //   if (ansArray[0] === "type") {
-    //     repl();
-    //   }
-    //
-    // if (ansArray[0] === "echo") {
-    // repl();
   });
 }
 
