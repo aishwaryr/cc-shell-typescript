@@ -12,22 +12,22 @@ const builtins = ["exit", "echo", "type"];
 function isExecutable(fullPath: string) {
   try {
     fs.accessSync(fullPath, fs.constants.X_OK);
-    return true;
+    return fs.statSync(fullPath).isFile();
   } catch {
     return false;
   }
 }
 
-function findExecutable(arg: string) {
+function findExecutable(arg: string): string | null {
   const PATH = process.env.PATH ?? "";
-  console.log(PATH);
-  for (const dir of PATH.split(path.delimiter)) {
-    const fullPath = path.join(dir, arg);
 
-    if (isExecutable(fullPath)) {
-      return fullPath;
-    }
+  for (const dir of PATH.split(path.delimiter)) {
+    if (!dir) continue;
+
+    const fullPath = path.join(dir, arg);
+    if (isExecutable(fullPath)) return fullPath;
   }
+  return null;
 }
 
 function repl() {
@@ -44,8 +44,9 @@ function repl() {
         if (builtins.includes(arg)) {
           console.log(arg + " is a shell builtin");
         } else {
-          findExecutable(arg);
-          console.log(arg + ": not found");
+          const fullPath = findExecutable(arg);
+          if (fullPath) console.log(arg + " is " + fullPath);
+          else console.log(arg + ": not found");
         }
         break;
 
