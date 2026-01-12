@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createInterface } from "readline";
+import { spawnSync } from "node:child_process";
 
 const rl = createInterface({
   input: process.stdin,
@@ -55,7 +56,13 @@ function repl() {
         break;
 
       default:
-        console.log(answer + ": command not found");
+        const fullPath = findExecutable(cmd);
+        if (!fullPath) {
+          console.log(cmd + ": not found");
+          break;
+        }
+        spawnSync(cmd, ansArray.slice(1), { stdio: "inherit" });
+
         break;
     }
     repl();
