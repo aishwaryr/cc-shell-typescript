@@ -8,7 +8,7 @@ const rl = createInterface({
   output: process.stdout,
 });
 
-const builtins = ["exit", "echo", "type"];
+const builtins = ["exit", "echo", "type", "pwd"];
 
 function isExecutable(fullPath: string) {
   try {
@@ -49,6 +49,10 @@ function repl() {
           if (fullPath) console.log(arg + " is " + fullPath);
           else console.log(arg + ": not found");
         }
+        break;
+
+      case "pwd":
+        console.log(process.cwd());
         break;
 
       case "echo":
