@@ -35,7 +35,7 @@ function repl() {
   rl.question("$ ", (answer: string) => {
     const ansArray = answer.trim().split(/\s+/);
     const cmd = ansArray[0];
-    const arg = ansArray.slice(1).join(" ");
+    let arg = ansArray.slice(1).join(" ");
 
     switch (cmd) {
       case "exit":
@@ -53,6 +53,9 @@ function repl() {
 
       case "cd":
         try {
+          if (arg === "~") {
+            arg = process.env.HOME as string;
+          }
           process.chdir(arg);
         } catch {
           console.log("cd: " + arg + ": No such file or directory");
