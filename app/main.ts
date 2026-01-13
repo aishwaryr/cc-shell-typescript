@@ -33,7 +33,7 @@ function findExecutable(arg: string): string | null {
 
 function repl() {
   rl.question("$ ", (answer: string) => {
-    const ansArray = answer.split(" ");
+    const ansArray = answer.trim().split(/\s+/);
     const cmd = ansArray[0];
     const arg = ansArray.slice(1).join(" ");
 
@@ -48,6 +48,14 @@ function repl() {
           const fullPath = findExecutable(arg);
           if (fullPath) console.log(arg + " is " + fullPath);
           else console.log(arg + ": not found");
+        }
+        break;
+
+      case "cd":
+        try {
+          process.chdir(arg);
+        } catch {
+          console.log("cd: " + arg + ": No such file or directory");
         }
         break;
 
