@@ -32,22 +32,33 @@ function findExecutable(arg: string): string | null {
 }
 
 function parser(answer: string): string[] {
-  let mode: "NORMAL" | "IN_QUOTE" = "NORMAL";
+  let mode: "NORMAL" | "IN_SINGLE_QUOTE" | "IN_DOUBLE_QUOTE" = "NORMAL";
   let current = "";
   let args = [];
   for (let i = 0; i < answer.length; i++) {
     const char = answer[i];
-    // single quote
     if (char === "'") {
-      mode = mode === "NORMAL" ? "IN_QUOTE" : "NORMAL";
-      // whitespace
+      // single quote
+      if (mode === "IN_DOUBLE_QUOTE") {
+        current = current + "'";
+      } else {
+        mode = mode === "NORMAL" ? "IN_SINGLE_QUOTE" : "NORMAL";
+      }
+    } else if (char === '"') {
+      // double quote
+      if (mode === "IN_SINGLE_QUOTE") {
+        current = current + '"';
+      } else {
+        mode = mode === "NORMAL" ? "IN_DOUBLE_QUOTE" : "NORMAL";
+      }
     } else if (char === " ") {
+      // whitespace
       if (mode === "NORMAL") {
         if (current.length > 0) {
           args.push(current);
           current = "";
         }
-      } else if (mode === "IN_QUOTE") {
+      } else if (mode === "IN_SINGLE_QUOTE" || mode === "IN_DOUBLE_QUOTE") {
         current = current + " ";
       }
       // every other character
