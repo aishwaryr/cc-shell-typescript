@@ -31,11 +31,41 @@ function findExecutable(arg: string): string | null {
   return null;
 }
 
+function parser(answer: string): string[] {
+  let mode: "NORMAL" | "IN_QUOTE" = "NORMAL";
+  let current = "";
+  let args = [];
+  for (let i = 0; i < answer.length; i++) {
+    const char = answer[i];
+    // single quote
+    if (char === "'") {
+      mode = mode === "NORMAL" ? "IN_QUOTE" : "NORMAL";
+      // whitespace
+    } else if (char === " ") {
+      if (mode === "NORMAL") {
+        if (current.length > 0) {
+          args.push(current);
+          current = "";
+        }
+      } else if (mode === "IN_QUOTE") {
+        current = current + " ";
+      }
+      // every other character
+    } else {
+      current = current + char;
+    }
+  }
+  if (current.length > 0) {
+    args.push(current);
+  }
+  return args;
+}
+
 function repl() {
   rl.question("$ ", (answer: string) => {
-    const ansArray = answer.trim().split(/\s+/);
-    const cmd = ansArray[0];
-    let arg = ansArray.slice(1).join(" ");
+    const args = parser(answer.trim());
+    const cmd = args[0];
+    let arg = args.slice(1).join(" ");
 
     switch (cmd) {
       case "exit":
@@ -76,7 +106,7 @@ function repl() {
           console.log(cmd + ": not found");
           break;
         }
-        spawnSync(cmd, ansArray.slice(1), { stdio: "inherit" });
+        spawnSync(cmd, args.slice(1), { stdio: "inherit" });
 
         break;
     }
