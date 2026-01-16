@@ -31,34 +31,39 @@ function findExecutable(arg: string): string | null {
   return null;
 }
 
+const NORMAL = "NORMAL" as const;
+const IN_SINGLE_QUOTE = "IN_SINGLE_QUOTE" as const;
+const IN_DOUBLE_QUOTE = "IN_DOUBLE_QUOTE" as const;
+
 function parser(answer: string): string[] {
-  let mode: "NORMAL" | "IN_SINGLE_QUOTE" | "IN_DOUBLE_QUOTE" = "NORMAL";
+  type Mode = typeof NORMAL | typeof IN_SINGLE_QUOTE | typeof IN_DOUBLE_QUOTE;
+  let mode: Mode = NORMAL;
   let current = "";
   let args = [];
   for (let i = 0; i < answer.length; i++) {
     const char = answer[i];
     if (char === "'") {
       // single quote
-      if (mode === "IN_DOUBLE_QUOTE") {
+      if (mode === IN_DOUBLE_QUOTE) {
         current = current + "'";
       } else {
-        mode = mode === "NORMAL" ? "IN_SINGLE_QUOTE" : "NORMAL";
+        mode = mode === NORMAL ? IN_SINGLE_QUOTE : NORMAL;
       }
     } else if (char === '"') {
       // double quote
-      if (mode === "IN_SINGLE_QUOTE") {
+      if (mode === IN_SINGLE_QUOTE) {
         current = current + '"';
       } else {
-        mode = mode === "NORMAL" ? "IN_DOUBLE_QUOTE" : "NORMAL";
+        mode = mode === NORMAL ? IN_DOUBLE_QUOTE : NORMAL;
       }
     } else if (char === " ") {
       // whitespace
-      if (mode === "NORMAL") {
+      if (mode === NORMAL) {
         if (current.length > 0) {
           args.push(current);
           current = "";
         }
-      } else if (mode === "IN_SINGLE_QUOTE" || mode === "IN_DOUBLE_QUOTE") {
+      } else if (mode === IN_SINGLE_QUOTE || mode === IN_DOUBLE_QUOTE) {
         current = current + " ";
       }
       // every other character
