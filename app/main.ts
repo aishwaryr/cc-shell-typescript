@@ -40,9 +40,18 @@ function parser(answer: string): string[] {
   let mode: Mode = NORMAL;
   let current = "";
   let args = [];
+  let isLiteral = false;
   for (let i = 0; i < answer.length; i++) {
     const char = answer[i];
-    if (char === "'") {
+    if (isLiteral) {
+      current += char;
+      isLiteral = false;
+      continue;
+    } else if (char === "\\" && i < answer.length - 1 && mode === NORMAL) {
+      // backslash
+      isLiteral = true;
+      continue;
+    } else if (char === "'") {
       // single quote
       if (mode === IN_DOUBLE_QUOTE) {
         current = current + "'";
