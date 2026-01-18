@@ -39,32 +39,44 @@ function parser(answer: string): string[] {
   type Mode = typeof NORMAL | typeof IN_SINGLE_QUOTE | typeof IN_DOUBLE_QUOTE;
   let mode: Mode = NORMAL;
   let current = "";
-  let args = [];
+  let args: string[] = [];
   let isLiteral = false;
   for (let i = 0; i < answer.length; i++) {
     const char = answer[i];
+
     if (isLiteral) {
       current += char;
       isLiteral = false;
       continue;
-    } else if (char === "\\" && i < answer.length - 1 && mode === NORMAL) {
+    } else if (char === "\\") {
       // backslash
-      isLiteral = true;
-      continue;
+
+      if (i === answer.length - 1) {
+        current += "\\";
+        continue;
+      }
+
+      const nextChar = i + 1 < answer.length ? answer[i + 1] : null;
+
+      if (
+        mode === NORMAL ||
+        (mode === IN_DOUBLE_QUOTE && (nextChar === "\\" || nextChar === '"'))
+      ) {
+        isLiteral = true;
+        continue;
+      } else {
+        current += "\\";
+      }
     } else if (char === "'") {
       // single quote
-      if (mode === IN_DOUBLE_QUOTE) {
-        current = current + "'";
-      } else {
-        mode = mode === NORMAL ? IN_SINGLE_QUOTE : NORMAL;
-      }
+      if (mode === NORMAL) mode = IN_SINGLE_QUOTE;
+      else if (mode === IN_SINGLE_QUOTE) mode = NORMAL;
+      else current += "'";
     } else if (char === '"') {
       // double quote
-      if (mode === IN_SINGLE_QUOTE) {
-        current = current + '"';
-      } else {
-        mode = mode === NORMAL ? IN_DOUBLE_QUOTE : NORMAL;
-      }
+      if (mode === NORMAL) mode = IN_DOUBLE_QUOTE;
+      else if (mode === IN_DOUBLE_QUOTE) mode = NORMAL;
+      else current += '"';
     } else if (char === " ") {
       // whitespace
       if (mode === NORMAL) {
